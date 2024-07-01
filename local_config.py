@@ -1,0 +1,4 @@
+# local_config.py
+
+API_KEY = "YOUR_API_KEY_HERE"
+STEAM_ID = "YOUR_USER_ID_HERE"
