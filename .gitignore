@@ -4,3 +4,4 @@ __pycache__/
 .vscode/
 WWW/
 local_config.py
+.DS_Store
