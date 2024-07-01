@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steam Games Summary</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Steam Games Summary</h1>
+    <table id="gamesTable">
+        <tr>
+            <th onclick="sortTable('name')">Game</th>
+            <th onclick="sortTable('hours')">Hours Played</th>
+        </tr>
+    </table>
+    <p id="summary"></p>
+    <script>
+        let gamesData = [];
+
+        fetch('steam_data.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                gamesData = data.games;
+                populateTable(gamesData);
+                
+                const summary = document.getElementById('summary');
+                summary.innerHTML = `
+                    Total Games: ${data.total_games} <br>
+                    Total Hours Played: ${data.total_hours.toFixed(2)} (${data.total_hours_formatted}) <br>
+                    Games Not Played: ${data.not_played_count}
+                `;
+            })
+            .catch(error => console.error('Error fetching the JSON:', error));
+
+        function populateTable(data) {
+            const gamesTable = document.getElementById('gamesTable');
+            while (gamesTable.rows.length > 1) {
+                gamesTable.deleteRow(1);
+            }
+
+            data.forEach(game => {
+                const row = gamesTable.insertRow();
+                const cell1 = row.insertCell(0);
+                const cell2 = row.insertCell(1);
+                
+                cell1.innerHTML = `<a href="game_details.html?appid=${game.appid}">${game.name}</a>`;
+                cell2.innerHTML = game.playtime_hours.toFixed(2);
+            });
+        }
+
+        function sortTable(criteria) {
+            if (criteria === 'name') {
+                gamesData.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (criteria === 'hours') {
+                gamesData.sort((a, b) => b.playtime_hours - a.playtime_hours);
+            }
+            populateTable(gamesData);
+        }
+    </script>
+</body>
+</html>

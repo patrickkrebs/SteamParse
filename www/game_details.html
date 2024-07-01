@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Details</title>
+</head>
+<body>
+    <h1 id="gameName">Game Details</h1>
+    <div id="gameDetails"></div>
+    <p><a href="index.html">Back to Summary</a></p>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const appid = urlParams.get('appid');
+
+        fetch('steam_data.json')
+            .then(response => response.json())
+            .then(data => {
+                const game = data.games.find(g => g.appid == appid);
+                if (!game) {
+                    document.getElementById('gameDetails').innerHTML = 'Game not found!';
+                    return;
+                }
+
+                document.getElementById('gameName').innerText = game.name;
+
+                let gameDetailsHTML = `<h2>Playtime: ${game.playtime_hours.toFixed(2)} hours</h2>`;
+                
+                if (game.user_stats.stats) {
+                    gameDetailsHTML += '<h2>User Stats</h2><ul>';
+                    game.user_stats.stats.forEach(stat => {
+                        gameDetailsHTML += `<li>${stat.name}: ${stat.value}</li>`;
+                    });
+                    gameDetailsHTML += '</ul>';
+                }
+
+                if (game.global_achievements) {
+                    gameDetailsHTML += '<h2>Global Achievements</h2><ul>';
+                    game.global_achievements.forEach(achievement => {
+                        gameDetailsHTML += `<li>${achievement.name}: ${achievement.percent}%</li>`;
+                    });
+                    gameDetailsHTML += '</ul>';
+                }
+
+                if (game.player_achievements) {
+                    gameDetailsHTML += '<h2>Player Achievements</h2><ul>';
+                    game.player_achievements.forEach(achievement => {
+                        gameDetailsHTML += `<li>${achievement.apiname}: ${achievement.achieved ? 'Achieved' : 'Not Achieved'}</li>`;
+                    });
+                    gameDetailsHTML += '</ul>';
+                }
+
+                document.getElementById('gameDetails').innerHTML = gameDetailsHTML;
+            })
+            .catch(error => console.error('Error fetching the JSON:', error));
+    </script>
+</body>
+</html>
