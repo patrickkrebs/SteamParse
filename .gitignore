@@ -3,6 +3,6 @@ __pycache__/
 *.pyc
 .vscode/
 www/steam_data.json
-local_config.py
 .DS_Store
 steam_parser_v01.py
+local_config.py
